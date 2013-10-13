@@ -11,3 +11,10 @@
 *.lai
 *.la
 *.a
+
+# Mac OSX hidden files
+.DS_Store
+
+# EWE Files
+*.ewe
+*.tmp
