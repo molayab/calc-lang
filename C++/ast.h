@@ -1,6 +1,11 @@
 #ifndef ast_h
 #define ast_h
 
+#include <iostream>
+#include "calculator.h"
+#include "compiler.h"
+#include "token.h"
+
 //using namespace std; <<-- OJO CON ESTA LINEA
 
 class AST {

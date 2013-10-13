@@ -1,7 +1,4 @@
 #include "ast.h"
-#include <iostream>
-#include "calculator.h"
-#include "compiler.h"
 
 // for debug information uncomment
 //#define debug
@@ -64,7 +61,7 @@ AddNode::AddNode(AST* left, AST* right):
 }
 
 int AddNode::evaluate() {
-	
+	comp->operate(add);
    return getLeftSubTree()->evaluate() + getRightSubTree()->evaluate();
 }
 
@@ -97,10 +94,12 @@ int SubNode::evaluate() {
 NumNode::NumNode(int n) :
    AST(),
    val(n)
-{}
+{
+	comp->push(n);
+}
 
 int NumNode::evaluate() {
-	comp->push(val);
+	
    return val;
 }
 

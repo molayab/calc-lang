@@ -24,7 +24,7 @@ public:
 	~Compiler(); // destruir el objeto y cerrar el archivo
 	void init(TokenType); // Inicia un nuevo nodo
 	void push(int); // Crea un NumNode (EWE) con un int
-	void operate(TokenType, string=nil); // Crea la operacion en EWE
+	void operate(TokenType, string=""); // Crea la operacion en EWE
 	void write(); // Guarda el buffer en el archivo
 };
 
