@@ -17,7 +17,7 @@ Calculator* calc;
 Compiler* comp;
 
 string prompt;
-bool isNormalMode;
+bool isNormalMode, isCompilationMode = NO;
 
 void execute(char *argv);
 
@@ -39,24 +39,28 @@ int main(int argc, char* argv[]) {
 	string line;
    
 	calc = new Calculator();
-	comp = new Compiler();
 	
 	do {
 		try {
+			comp = new Compiler(); // Se crea un instancia de compilacion
+			
 			cout << prompt;
 			getline(cin, line);
 
 			if (line == "<eof>" || line == "<EOF>") break;
 			
-			comp->init();
+			//comp->init();
 			int result = calc->eval(line, !isNormalMode);
-			comp->close();
+			
+			if (isCompilationMode) comp->write();
 			
 			if (isNormalMode) {
 				cout << "The result is " << result << endl;
 			} else {
 				cout << "= " << result << endl;
 			}
+			
+			delete comp; // Se libera la instancia de compilacion
 		} catch(Exception ex) {
 			if (isNormalMode) {
 				cout << "Program Aborted due to exception!" << endl;
@@ -65,7 +69,6 @@ int main(int argc, char* argv[]) {
 	} while (!isNormalMode);
 		
 	delete calc;
-	delete comp;
 }
 
 void execute(char *argv) {
@@ -77,6 +80,7 @@ void execute(char *argv) {
             break;
         case 'c':
             cout << "-> EWEMode actived" << endl;
+			isCompilationMode = YES;
             break;
         default:
             prompt = "Please enter a calculator expression: ";

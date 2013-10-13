@@ -1,79 +1,55 @@
 #include "compiler.h"
 
-Compiler::Compiler() : need(0) {
-	opt = new queue<string>;
+Compiler::Compiler() {
+	buffer << "main:";
+	buffer << tabl << "sp := 6" << endl;
+	buffer << tabl << "one := 1" << endl;
+	buffer << tabl << "three := 3" << endl;
 }
 
 Compiler::~Compiler() {
-	delete opt;
-}
-
-void Compiler::init() {
-	write("main:", YES);
-	write("sp := 6");
-	write("one := 1");
-	write("three := 3");
-	write("sp := sp + one");
-}
-
-void Compiler::close() {
-	write("sp := sp - one");
-	write("tmp := M[sp + 1]");
-	write("writeInt(tmp)");
-	write("halt");
-	write("equ tmp M[0] ", YES);
-	write("equ tmp2 M[1] ", YES);
-	write("equ one M[2] ", YES);
-	write("equ three M[3] ", YES);
-	write("equ mem M[4] ", YES);
-	write("equ sp M[5] ", YES);
-	write("equ stack M[6] ", YES);
-	write("");
-}
-
-void Compiler::assign(string str) {
-	opt->push(str);
 	
-	if (need > 0) {
-		compile();
+}
+
+void Compiler::init(TokenType type) {
+	if (isBinaryOperate(type)) {
+		buffer << tabl << "sp := sp + three" << endl;
+	} else {
+		buffer << tabl << "sp := sp + one" << endl;
 	}
 }
 
-void Compiler::operate(TokenType type) {
-	typ = type;
-	
+void Compiler::push(int num) {
+	buffer << tabl << "tmp := " << num << endl;
+	buffer << tabl << "M[sp+0] := tmp" << endl;
+}
+
+void Compiler::operate(TokenType type, string keyword) {
 	switch (type) {
 		case add:
-			need = 2;
 			break;
-			
+		case sub:
+			break;
+		case times:
+			break;
+		case divide:
+			break;
 		default:
+			if (keyword == "S" || keyword == "s") {
+				buffer << tabl << "sp := sp - one" << endl;
+				buffer << tabl << "tmp := M[sp+1]" << endl;
+				buffer << tabl << "M[sp+0] := tem" << endl;
+				buffer << tabl << "men := tmp" << endl;
+				
+			}
 			break;
 	}
 }
 
-void Compiler::compile() {
-	stringstream s;
-	
-	int j = opt->size();
-	
-	for (int i = 0; i < j; ++i) {
-		if (typ == add) {
-			s << "tmp";
-			if (i > 0) s << "2";
-			
-			s << " := " << opt->front() << endl;
-			opt->pop();
-		}
-		
-	}
-	
-	opt->empty();
-	
-	write(s.str());
+void Compiler::write() {
+	cout << buffer.str() << endl;
 }
 
-void Compiler::write(string str, bool isFirstLine) {
-	if (!isFirstLine) std::cout << tabl << str << endl;
-	else std::cout << str;
+bool Compiler::isBinaryOperate(TokenType type) {
+	return (type == add || type == sub || type == times || type == divide);
 }

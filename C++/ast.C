@@ -58,9 +58,13 @@ AST* UnaryNode::getSubTree() const {
 }
 
 AddNode::AddNode(AST* left, AST* right):
-   BinaryNode(left,right) {}
+   BinaryNode(left,right)
+{
+	comp->init(add);
+}
 
 int AddNode::evaluate() {
+	
    return getLeftSubTree()->evaluate() + getRightSubTree()->evaluate();
 }
 
@@ -96,6 +100,7 @@ NumNode::NumNode(int n) :
 {}
 
 int NumNode::evaluate() {
+	comp->push(val);
    return val;
 }
 
@@ -104,6 +109,7 @@ StoreNode::StoreNode(AST * sub) : UnaryNode(sub) { }
 int StoreNode::evaluate() {
   int tmp;
   tmp = getSubTree()->evaluate();
+	comp->operate(keyword, "S");
 
   calc->store(tmp);
 

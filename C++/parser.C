@@ -40,7 +40,7 @@ AST* Parser::RestExpr(AST* e) {
    Token* t = scan->getToken();
 	
    if (t->getType() == add) {
-	   comp->operate(add);
+	   //comp->operate(add);
 	   return RestExpr(new AddNode(e,Term()));
    }
 
@@ -101,7 +101,7 @@ AST* Parser::Factor() {
      int val;
      in >> val;
 	
-	   comp->assign(t->getLex());
+	//comp->assign(t->getLex());
 	   
      return new NumNode(val);
    } else if (t->getType() == keyword) {

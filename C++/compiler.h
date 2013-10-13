@@ -10,25 +10,22 @@
 #define YES true
 #define NO false
 #define nil NULL
-#define tabl "    "
+#define tabl "\t"
 
 using namespace std;
 
 class Compiler {
 private:
-	queue<string> * opt;
-	int need;
-	TokenType typ;
-	void write(string, bool=NO);
-	void compile();
+	stringstream buffer;
+	bool isBinaryOperate(TokenType);
 
 public:
-	Compiler();
-	~Compiler();
-	void init();
-	void assign(string);
-	void operate(TokenType);
-	void close();
+	Compiler(); // Costruir el objeto y el archivo
+	~Compiler(); // destruir el objeto y cerrar el archivo
+	void init(TokenType); // Inicia un nuevo nodo
+	void push(int); // Crea un NumNode (EWE) con un int
+	void operate(TokenType, string=nil); // Crea la operacion en EWE
+	void write(); // Guarda el buffer en el archivo
 };
 
 extern Compiler * comp;
