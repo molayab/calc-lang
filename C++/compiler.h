@@ -4,7 +4,9 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include <queue>
+#include <string>
+#include <stack>
+#include <vector>
 #include "token.h"
 
 #define YES true
@@ -14,18 +16,24 @@
 
 using namespace std;
 
+enum NodeType {
+	terminal, nterminal
+};
+
 class Compiler {
 private:
-	stringstream buffer;
-	bool isBinaryOperate(TokenType);
-
+	
 public:
-	Compiler(); // Costruir el objeto y el archivo
-	~Compiler(); // destruir el objeto y cerrar el archivo
-	void init(TokenType); // Inicia un nuevo nodo
-	void push(int); // Crea un NumNode (EWE) con un int
-	void operate(TokenType, string=""); // Crea la operacion en EWE
-	void write(); // Guarda el buffer en el archivo
+	Compiler();
+	~Compiler();
+	void push(int);
+	void prepare();
+	void init(bool);
+	void pushStore();
+	void operate(TokenType);
+	void write();
+	void close(TokenType);
+	
 };
 
 extern Compiler * comp;

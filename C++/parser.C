@@ -40,7 +40,6 @@ AST* Parser::RestExpr(AST* e) {
    Token* t = scan->getToken();
 	
    if (t->getType() == add) {
-	   //comp->operate(add);
 	   return RestExpr(new AddNode(e,Term()));
    }
 
@@ -72,7 +71,6 @@ AST* Parser::RestTerm(AST* e) {
 }
 
 AST* Parser::Storable() {
-  //cout << "Storable not implemented" << endl;
   AST * ret = Factor();
   Token  *t = scan->getToken();
 
@@ -92,7 +90,6 @@ AST* Parser::Storable() {
 }
 
 AST* Parser::Factor() {
-  //cout << "Factor not implemented" << endl;
    
    Token *t = scan->getToken();
    
@@ -100,8 +97,6 @@ AST* Parser::Factor() {
      istringstream in(t->getLex());
      int val;
      in >> val;
-	
-	//comp->assign(t->getLex());
 	   
      return new NumNode(val);
    } else if (t->getType() == keyword) {

@@ -42,6 +42,7 @@ class UnaryNode : public AST {
 class AddNode : public BinaryNode {
  public:
    AddNode(AST* left, AST* right);
+	~AddNode();
    
    int evaluate();
 };
@@ -49,6 +50,7 @@ class AddNode : public BinaryNode {
 class MultNode : public BinaryNode {
  public:
    MultNode(AST* left, AST* right);
+	~MultNode();
    
    int evaluate();
 };
@@ -56,6 +58,7 @@ class MultNode : public BinaryNode {
 class DivNode : public BinaryNode {
  public:
    DivNode(AST* left, AST* right);
+	~DivNode();
    
    int evaluate();
 };
@@ -63,6 +66,7 @@ class DivNode : public BinaryNode {
 class SubNode : public BinaryNode {
  public:
    SubNode(AST* left, AST* right);
+	~SubNode();
 
    int evaluate();
 };
@@ -70,6 +74,7 @@ class SubNode : public BinaryNode {
 class NumNode : public AST {
  public:
    NumNode(int n);
+	~NumNode();
 
    int evaluate();
 
@@ -80,12 +85,16 @@ class NumNode : public AST {
 class StoreNode : public UnaryNode {
  public:
   StoreNode(AST * sub);
+	~StoreNode();
+	
   int evaluate();
 };
 
 class RecallNode : public AST {
  public:
   RecallNode();
+	~RecallNode();
+	
   int evaluate();
 
 };

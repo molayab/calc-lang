@@ -32,6 +32,7 @@ AST* BinaryNode::getLeftSubTree() const {
 }
 
 AST* BinaryNode::getRightSubTree() const {
+	comp->prepare();
    return rightTree;
 }
 
@@ -56,67 +57,103 @@ AST* UnaryNode::getSubTree() const {
 
 AddNode::AddNode(AST* left, AST* right):
    BinaryNode(left,right)
-{
-	comp->init(add);
-}
+{ }
+
+AddNode::~AddNode() { }
 
 int AddNode::evaluate() {
+	comp->init(YES);
+	int ret = getLeftSubTree()->evaluate() + getRightSubTree()->evaluate();
 	comp->operate(add);
-   return getLeftSubTree()->evaluate() + getRightSubTree()->evaluate();
+	comp->close(add);
+	
+	return ret;
 }
 
 MultNode::MultNode(AST* left, AST* right):
    BinaryNode(left,right)
-{}
+{ }
+
+MultNode::~MultNode() { }
 
 int MultNode::evaluate() {
-   return getLeftSubTree()->evaluate() * getRightSubTree()->evaluate();
+	comp->init(YES);
+	int ret = getLeftSubTree()->evaluate() * getRightSubTree()->evaluate();
+	comp->operate(times);
+	comp->close(times);
+	
+	return ret;
 }
 
 DivNode::DivNode(AST* left, AST* right):
    BinaryNode(left,right)
-{}
+{ }
+
+DivNode::~DivNode() { }
 
 int DivNode::evaluate() {
-   return getLeftSubTree()->evaluate() / getRightSubTree()->evaluate();
+	comp->init(YES);
+	int ret = getLeftSubTree()->evaluate() / getRightSubTree()->evaluate();
+	comp->operate(divide);
+	comp->close(divide);
+	
+	return ret;
 }
 
 
 
 SubNode::SubNode(AST* left, AST* right):
    BinaryNode(left,right)
-{}
+{ }
+
+SubNode::~SubNode() { }
 
 int SubNode::evaluate() {
-   return getLeftSubTree()->evaluate() - getRightSubTree()->evaluate();
+	comp->init(YES);
+	int ret = getLeftSubTree()->evaluate() - getRightSubTree()->evaluate();
+	comp->operate(sub);
+	comp->close(sub);
+   
+	return ret;
 }
 
 NumNode::NumNode(int n) :
    AST(),
    val(n)
-{
-	comp->push(n);
-}
+{ }
+
+NumNode::~NumNode () { }
 
 int NumNode::evaluate() {
-	
+	comp->push(val);
    return val;
 }
 
-StoreNode::StoreNode(AST * sub) : UnaryNode(sub) { }
+StoreNode::StoreNode(AST * sub) : UnaryNode(sub)
+{ }
+
+StoreNode::~StoreNode() { }
 
 int StoreNode::evaluate() {
+	cout << "START STORENODE" << endl;
   int tmp;
   tmp = getSubTree()->evaluate();
-	comp->operate(keyword, "S");
+	cout << "S" << endl;
 
   calc->store(tmp);
-
+	cout << "END STORENODE" << endl;
   return tmp;
 }
 
-RecallNode::RecallNode() : AST() { }
+RecallNode::RecallNode() : AST()
+{ }
+
+RecallNode::~RecallNode () { }
 
 int RecallNode::evaluate() {
-  return calc->recall();
+	cout << "START RECALLNODE" << endl;
+	int ret = calc->recall();
+	cout << "END RECALLNODE" << endl;
+	
+	return ret;
 }
