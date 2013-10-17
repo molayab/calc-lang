@@ -17,7 +17,8 @@ Calculator* calc;
 Compiler* comp;
 
 string prompt;
-bool isNormalMode, isCompilationMode = NO;
+bool isNormalMode = YES, isCompilationMode = NO;
+int i = 0;
 
 void execute(char *argv);
 
@@ -39,30 +40,38 @@ int main(int argc, char* argv[]) {
 	string line;
    
 	calc = new Calculator();
+	comp = new Compiler();
 	
 	do {
 		try {
 			cout << prompt;
 			getline(cin, line);
 
-			if (line == "<eof>" || line == "<EOF>") break;
+			if (line == "<eof>" || line == "<EOF>" || cin.eof()) {
+				cout << "[*] Calc terminate succesful" << endl;
+				break;
+			}
 			
 			int result;
+			
 			if (isCompilationMode) {
-				comp = new Compiler();
-				comp->open();
+				if (i > 0) {
+					stringstream s;
+					s << "a" << i << ".ewe";
+					comp->open(s.str().data());
+				} else {
+					comp->open("a.ewe");
+				}
+				
 				result = calc->eval(line, !isNormalMode);
 				comp->write();
-				delete comp; // Se libera la instancia de compilacion
-			} else {
-				result = calc->eval(line, !isNormalMode);
-			}
+				
+				++i;
+			} else result = calc->eval(line, !isNormalMode);
 			
-			if (isNormalMode) {
-				cout << "The result is " << result << endl;
-			} else {
-				cout << "= " << result << endl;
-			}
+			if (isNormalMode) cout << "The result is " << result << endl;
+			else cout << "= " << result << endl;
+			
 		} catch(Exception ex) {
 			if (isNormalMode) {
 				cout << "Program Aborted due to exception!" << endl;
@@ -71,22 +80,22 @@ int main(int argc, char* argv[]) {
 	} while (!isNormalMode);
 		
 	delete calc;
+	delete comp; // Se libera la instancia de compilacion
 }
 
 void execute(char *argv) {
     switch (*argv) {
         case 'i': 
-            cout << "--> Recursion Actived..." << endl;
+            cout << "--> Interaive Actived..." << endl;
             prompt = "> ";
             isNormalMode = NO;
             break;
         case 'c':
-            cout << "-> EWEMode actived" << endl;
+            cout << "-> Compiled actived" << endl;
 			isCompilationMode = YES;
-            break;
+			break;
         default:
             prompt = "Please enter a calculator expression: ";
-            isNormalMode = YES;
             break;
     }
 }

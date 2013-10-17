@@ -16,17 +16,17 @@
 
 using namespace std;
 
-enum NodeType {
-	terminal, nterminal
-};
-
 class Compiler {
 private:
+	ofstream file;
+	stringstream buffer;
+	bool ready;
+	void close();
 	
 public:
 	Compiler();
 	~Compiler();
-	void open();
+	void open(const char *);
 	void push(int);
 	void prepare();
 	void init(bool);
@@ -34,8 +34,7 @@ public:
 	void pushRecall();
 	void operate(TokenType);
 	void write();
-	void close(TokenType);
-	
+	bool isReady();
 };
 
 extern Compiler * comp;
