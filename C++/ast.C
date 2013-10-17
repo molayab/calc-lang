@@ -135,13 +135,12 @@ StoreNode::StoreNode(AST * sub) : UnaryNode(sub)
 StoreNode::~StoreNode() { }
 
 int StoreNode::evaluate() {
-	cout << "START STORENODE" << endl;
+	comp->init(NO);
   int tmp;
   tmp = getSubTree()->evaluate();
-	cout << "S" << endl;
 
   calc->store(tmp);
-	cout << "END STORENODE" << endl;
+	comp->pushStore();
   return tmp;
 }
 
@@ -151,9 +150,8 @@ RecallNode::RecallNode() : AST()
 RecallNode::~RecallNode () { }
 
 int RecallNode::evaluate() {
-	cout << "START RECALLNODE" << endl;
 	int ret = calc->recall();
-	cout << "END RECALLNODE" << endl;
+	comp->pushRecall();
 	
 	return ret;
 }

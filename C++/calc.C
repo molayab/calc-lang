@@ -42,25 +42,27 @@ int main(int argc, char* argv[]) {
 	
 	do {
 		try {
-			comp = new Compiler(); // Se crea un instancia de compilacion
-			
 			cout << prompt;
 			getline(cin, line);
 
 			if (line == "<eof>" || line == "<EOF>") break;
 			
-			//comp->init();
-			int result = calc->eval(line, !isNormalMode);
-			
-			if (isCompilationMode) comp->write();
+			int result;
+			if (isCompilationMode) {
+				comp = new Compiler();
+				comp->open();
+				result = calc->eval(line, !isNormalMode);
+				comp->write();
+				delete comp; // Se libera la instancia de compilacion
+			} else {
+				result = calc->eval(line, !isNormalMode);
+			}
 			
 			if (isNormalMode) {
 				cout << "The result is " << result << endl;
 			} else {
 				cout << "= " << result << endl;
 			}
-			
-			delete comp; // Se libera la instancia de compilacion
 		} catch(Exception ex) {
 			if (isNormalMode) {
 				cout << "Program Aborted due to exception!" << endl;

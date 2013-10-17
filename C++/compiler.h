@@ -26,10 +26,12 @@ private:
 public:
 	Compiler();
 	~Compiler();
+	void open();
 	void push(int);
 	void prepare();
 	void init(bool);
 	void pushStore();
+	void pushRecall();
 	void operate(TokenType);
 	void write();
 	void close(TokenType);
