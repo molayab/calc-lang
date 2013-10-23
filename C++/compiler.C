@@ -102,8 +102,8 @@ void Compiler::close() {
 	buffer << tabl << "halt" << endl;
 	buffer << "equ tmp   M[0]" << endl;
 	buffer << "equ tmp2  M[1]" << endl;
-	buffer << "equ uno   M[2]" << endl;
-	buffer << "equ tres  M[3]" << endl;
+	buffer << "equ one   M[2]" << endl;
+	buffer << "equ three M[3]" << endl;
 	buffer << "equ mem   M[4]" << endl;
 	buffer << "equ sp    M[5]" << endl;
 	buffer << "equ stack M[6]" << endl;
