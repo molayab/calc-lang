@@ -1,0 +1,360 @@
+#!/usr/bin/ruby
+require 'stringio'
+require 'set'
+
+class Token
+   attr_reader :type, :line, :col
+
+   def initialize(type,lineNum,colNum)
+      @type = type
+      @line = lineNum
+      @col = colNum
+   end
+end
+
+class LexicalToken < Token
+   attr_reader :lex
+   
+   def initialize(type,lex,lineNum,colNum)
+      super(type,lineNum,colNum)
+      
+      @lex = lex
+   end
+end
+      
+class Scanner
+   def initialize(inStream)
+      @istream = inStream
+      @keywords = Set.new(["S","R"])
+      @lineCount = 1
+      @colCount = -1
+      @needToken = true
+      @lastToken = nil
+   end
+
+   def putBackToken()
+      @needToken = false
+   end
+
+   def getToken()
+      if !@needToken
+         @needToken = true
+         return @lastToken
+      end
+
+      state = 0
+      foundOne = false
+      c = @istream.getc()
+
+      if @istream.eof() then
+         @lastToken = Token.new(:eof,@lineCount,@colCount)
+         return @lastToken
+      end
+
+      while !foundOne
+         @colCount = @colCount + 1
+         case state
+         when 0
+            lex = ""
+            column = @colCount
+            line = @lineCount
+            if isLetter(c) then state=1
+            elsif isDigit(c) then state=2
+            elsif c == ?+ then state = 3
+            elsif c == ?- then state = 4
+            elsif c == ?* then state = 5
+            elsif c == ?/ then state = 6
+            elsif c == ?( then state = 7
+            elsif c == ?) then state = 8
+            elsif c == ?\n then 
+              @colCount = -1
+              @lineCount = @lineCount+1
+            elsif isWhiteSpace(c) then state = state #ignore whitespace
+            elsif @istream.eof() then
+               @foundOne = true
+               type = :eof
+            else
+               puts "Unrecognized Token found at line ",line," and column ",column,"\n"
+               raise "Unrecognized Token"
+            end
+         when 1
+            if isLetter(c) or isDigit(c) then state = 1
+            else
+               if @keywords.include?(lex) then
+                  foundOne = true
+                  type = :keyword
+               else
+                  foundOne = true
+                  type = :identifier
+               end
+            end
+         when 2
+            if isDigit(c) then state = 2
+            else
+               type = :number
+               foundOne = true
+            end
+         when 3
+            type = :add
+            foundOne = true
+         when 4
+            type = :sub
+            foundOne = true
+         when 5
+            type = :times
+            foundOne = true
+         when 6
+            type = :divide
+            foundOne = true
+         when 7
+            type = :lparen
+            foundOne = true
+         when 8
+            type = :rparen
+            foundOne = true
+         end
+
+         if !foundOne then
+            lex.concat(c)
+            c = @istream.getc()
+         end
+
+      end
+   
+      @istream.ungetc(c)   
+      @colCount = @colCount - 1
+      if type == :number or type == :identifier or type == :keyword then
+         t = LexicalToken.new(type,lex,line,column)
+      else
+         t = Token.new(type,line,column)
+      end
+
+      @lastToken = t
+      return t 
+   end
+
+private
+	def isLetter(c) 
+	   return ((?a <= c and c <= ?z) or (?A <= c and c <= ?Z))
+	end
+
+	def isDigit(c)
+	   return (?0 <= c and c <= ?9)
+	end
+
+	def isWhiteSpace(c)
+	   return (c == ?\  or c == ?\n or c == ?\t)
+	end
+end
+      
+class BinaryNode
+   attr_reader :left, :right
+   
+   def initialize(left,right)
+      @left = left
+      @right = right
+   end
+end
+   
+class UnaryNode
+   attr_reader :subTree
+   
+   def initialize(subTree)
+      @subTree = subTree
+   end
+end
+
+class AddNode < BinaryNode
+   def initialize(left, right)
+      super(left,right)
+   end
+   
+   def evaluate() 
+      return @left.evaluate() + @right.evaluate()
+   end
+end
+
+class SubNode < BinaryNode
+   def initialize(left, right)
+      super(left,right)
+   end
+   
+   def evaluate() 
+      return @left.evaluate() - @right.evaluate()
+   end
+end
+
+class MultNode < BinaryNode
+   def initialize(left, right)
+      super(left,right)
+   end
+
+   def evaluate()
+      return @left.evaluate() * @right.evaluate()
+   end
+end
+
+class DivNode < BinaryNode
+   def initialize(left, right)
+      super(left,right)
+   end
+
+   def evaluate()
+      return @left.evaluate() / @right.evaluate()
+   end
+end
+      
+class NumNode 
+   def initialize(num)
+      @num = num
+   end
+   
+   def evaluate() 
+      return @num
+   end
+end   
+
+class StoreNode < UnaryNode
+  def initialize(subTree)
+    super(subTree)
+  end
+
+  def evaluate()
+    $calc.memory = @subTree.evaluate()
+    return $calc.memory
+  end
+end
+
+class RecallNode
+  def initialize() ; end
+
+  def evaluate()
+    return $calc.memory
+  end
+end
+      
+class Parser
+   def initialize(istream)
+      @scan = Scanner.new(istream)
+   end
+   
+   def parse()
+      return Prog()
+   end
+   
+private
+   def Prog()
+      result = Expr()
+      t = @scan.getToken()
+      
+      if t.type != :eof then
+         print "Expected EOF. Found ", t.type, ".\n"
+         raise "Parse Error"
+      end
+      
+      return result
+   end
+   
+   def Expr() 
+      return RestExpr(Term())
+   end
+   
+   def RestExpr(e) 
+      t = @scan.getToken()
+      
+      if t.type == :add then
+         return RestExpr(AddNode.new(e,Term()))
+      end
+      
+      if t.type == :sub then
+         return RestExpr(SubNode.new(e,Term()))
+      end
+      
+      @scan.putBackToken()
+      
+      return e
+   end
+   
+   def Term()
+      # Write your Term() code here. This code is just temporary
+      # so you can try the calculator out before finishing it.
+
+      t = @scan.getToken()
+      
+      if t.type == :number then
+         val = t.lex.to_i
+         return NumNode.new(val)
+      end
+      
+      puts "Term not implemented\n"
+      
+      raise "Parse Error"
+   end
+   
+   def RestTerm(e)
+   
+      puts "RestTerm not implemented"
+      raise "Parse Error"
+   end
+   
+   def Storable()
+     ast = Factor()
+     t = @sacn.getToken
+     if t.type == :keyword 
+       if t.lex == "S" 
+         return StoreNode.new(ast)
+       else
+         raise "Parser Error: Expected S"
+       end
+     else
+       @scan.putBackToken
+     end
+
+     return ast
+   end
+   
+   def Factor() 
+     t = @sacan.getToken
+     if t.type == :number 
+       return NumNode.new(t.lex.to_i)
+     else if t.type == :keywork 
+        if t.lex == "R" 
+          return RecallNode.new
+        else
+          raise "Parse Error: Expected R"
+        end
+     else if t.type == :lparen 
+          ast = Expr()
+          t = @sacn.getToken
+          if t.type != :rparen 
+            raise "Parser Error: Expected )";
+          end
+          return ast
+     else 
+          raise "Parser Error: Expected Number, R or ("
+     end
+   end         
+end
+
+class Calculator
+	attr_reader :memory
+	attr_writer :memory
+	
+	def initialize()
+	  @memory = 0
+	end
+	
+	def eval(expr)
+		parser = Parser.new(StringIO.new(expr))
+		ast = parser.parse()
+	   return ast.evaluate()
+	end
+end
+
+text = gets
+$calc = Calculator.new()
+
+puts "The result is " + $calc.eval(text).to_s
+
+
+
