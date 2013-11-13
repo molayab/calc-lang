@@ -79,8 +79,8 @@ AST* Parser::Storable() {
       return new StoreNode(ret);
     } else {
 		if (usePrompt) cout << "* ";
-      cout << "Expected S" << endl;
-      throw ParseError;
+        cout << "Expected S" << endl;
+        throw ParseError;
     }
   }
 
