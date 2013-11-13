@@ -498,7 +498,7 @@ class Parser
             end
         else if t.type == :lparen
             ast = Expr()
-            t = @sacn.getToken()
+            t = @scan.getToken()
             
             if t.type != :rparen
                 Compiler::error()
