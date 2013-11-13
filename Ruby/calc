@@ -1,5 +1,6 @@
 #!/usr/bin/ruby
 
+require 'FileUtils'
 require 'stringio'
 require 'set'
 
@@ -56,6 +57,12 @@ class Compiler
         else
             # ERROR
         end
+    end
+
+    def self.negate()
+        write(TABL + "tmp2 := 0")
+        write(TABL + "tmp := tmp2 - tmp")
+        write(TABL + "M[sp + 0] := tmp")
     end
 
     def self.push(number)
@@ -365,8 +372,9 @@ class NegateNode < UnaryNode
     end
     
     def evaluate()
-        puts @subTree.evaluate()
-        return - @subTree.evaluate()
+        ret = @subTree.evaluate()
+        Compiler::negate()
+        return - ret
     end
 end
 
@@ -466,11 +474,14 @@ class Parser
     end
     
     def Negate()
-        ast = Factor()
         t = @scan.getToken()
         
+        if t.type == :sub then
+            return NegateNode.new(Factor())
+        end
+        
         @scan.putBackToken()
-        return ast
+        return Factor()
     end
     
     def Factor()
@@ -541,8 +552,15 @@ if option == "-i"
     end
 elsif option == "-c"
     begin
-        expr = gets
+        begin
+            FileUtils::rm("a.ewe")
+            puts " --> Remove previous files [OK]"
+        rescue
+            puts " --> Remove file: a.ewe [NOT FOUND]"
+        end
+        
         print "Escriba una expresion: "
+        expr = gets
         
         Compiler::open()
         
